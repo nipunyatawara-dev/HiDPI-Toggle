@@ -2,22 +2,29 @@
 .cursor/
 .cursorignore
 .agents/
+.vscode/
+.idea/
 
 # SwiftPM
 .build/
+.swiftpm/
 *.xcodeproj
 *.xcworkspace
 DerivedData/
+*.dSYM/
 
 # Built app bundle (build locally with Scripts/package_app.sh)
 HiDPIToggle.app/
 
 # Release artifacts
 dist/
+*.dmg
 
 # macOS
 .DS_Store
 ._*
+.AppleDouble
+.LSOverride
 
 # Generated icon (regenerate with probe/icon_gen.swift)
 Icon.icns
@@ -26,3 +33,7 @@ Icon.iconset/
 # Compiled probe tools (build from probe/*.m locally)
 probe/probe
 probe/toggle_test
+
+# Editor backups
+*~
+*.swp

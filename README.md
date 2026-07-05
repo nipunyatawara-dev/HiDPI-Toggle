@@ -1,4 +1,4 @@
-# HiDPI Toggle
+[![](assets/01-menu-bar.png)](https://github.com/nipunyatawara-dev/HiDPI-Toggle)
 
 <p align="center">
   <img src="https://img.shields.io/badge/Swift-6-F05138?style=for-the-badge&logo=swift&logoColor=white" alt="Swift 6" />
@@ -20,6 +20,19 @@
   </a>
 </p>
 
+----
+
+### Get started:
+
+* [Download](#download) — grab the pre-built `.dmg` for Apple Silicon Macs
+* [Menu bar panel](#menu-bar-panel) — see how the app looks and works
+* [Build & run](#build--run) — clone, build, and run from source
+* [Contributing](#contributing) — pull requests welcome
+
+<br/>
+
+----
+
 [**HiDPI Toggle**](https://github.com/nipunyatawara-dev/HiDPI-Toggle) is a tiny macOS menu bar app that replicates BetterDisplay's HiDPI feature: it lists connected external monitors and gives each one a switch to turn HiDPI (Retina scaling) on or off.
 
 * One-click HiDPI toggle per external display from the menu bar
@@ -29,14 +42,13 @@
 * Launch at Login via `SMAppService` (visible in System Settings → Login Items)
 * Built with SwiftPM — no Xcode project required
 
-----
-
 # Contents <!-- omit in toc -->
 
-- [What is HiDPI Toggle](#what-is-hidpi-toggle)
+- [What HiDPI Toggle is and isn't](#what-hidpi-toggle-is-and-isnt)
 - [Menu bar panel](#menu-bar-panel)
 - [How it works](#how-it-works)
 - [Launch at login](#launch-at-login)
+- [Download](#download)
 - [Build & run](#build--run)
 - [Tech stack](#tech-stack)
 - [Limitations](#limitations)
@@ -44,7 +56,7 @@
 
 <a name="about"></a>
 
-## What is HiDPI Toggle
+# What HiDPI Toggle is and isn't
 
 * **HiDPI Toggle is** a free, open-source utility for anyone who wants sharper text and UI on an external monitor without paying for BetterDisplay — it unlocks the hidden Retina scaling modes macOS already knows about but does not expose in System Settings
 
@@ -52,7 +64,7 @@
 
 <a name="panel"></a>
 
-## Menu bar panel
+# Menu bar panel
 
 ![](assets/01-menu-bar.png)
 
@@ -93,6 +105,19 @@ The `probe/` folder contains the small research tools used to discover these hid
 The panel includes a **Launch at Login** switch backed by `SMAppService`. Enabling it registers the app as a login item (visible under **System Settings → General → Login Items**).
 
 Registration points at the app's current location on disk. If you move `HiDPIToggle.app` to a new folder, open the panel and re-enable the switch from the new location.
+
+<a name="download"></a>
+
+# Download
+
+Pre-built releases are available on the [Releases](https://github.com/nipunyatawara-dev/HiDPI-Toggle/releases) page.
+
+1. Download `HiDPIToggle-v1.0.dmg`
+2. Open the disk image and drag **HiDPI Toggle** to Applications
+3. On first launch, macOS may block the app — open **System Settings → Privacy & Security** and click **Open Anyway**
+4. Connect an external monitor, click the menu bar icon, and toggle HiDPI
+
+**Requirements:** macOS 14 (Sonoma) or later · Apple Silicon (M1 or later)
 
 <a name="build"></a>
 
