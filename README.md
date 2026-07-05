@@ -1,4 +1,4 @@
-[![](assets/01-menu-bar.png)](https://github.com/nipunyatawara-dev/HiDPI-Toggle)
+# HiDPI-Toggle
 
 <p align="center">
   <img src="https://img.shields.io/badge/Swift-6-F05138?style=for-the-badge&logo=swift&logoColor=white" alt="Swift 6" />
@@ -14,24 +14,8 @@
   <a href="https://github.com/nipunyatawara-dev/HiDPI-Toggle/releases/latest/download/HiDPIToggle-v1.0.dmg">
     <img src="https://img.shields.io/badge/Download%20for-macOS%20%28Apple%20Silicon%29-0A84FF?style=for-the-badge&logo=apple&logoColor=white" alt="Download for macOS (Apple Silicon)" />
   </a>
-  &nbsp;
-  <a href="https://github.com/nipunyatawara-dev/HiDPI-Toggle">
-    <img src="https://img.shields.io/badge/View%20on-GitHub-181717?style=for-the-badge&logo=github&logoColor=white" alt="View on GitHub" />
-  </a>
 </p>
 
-----
-
-### Get started:
-
-* [Download](#download) — grab the pre-built `.dmg` for Apple Silicon Macs
-* [Menu bar panel](#menu-bar-panel) — see how the app looks and works
-* [Build & run](#build--run) — clone, build, and run from source
-* [Contributing](#contributing) — pull requests welcome
-
-<br/>
-
-----
 
 [**HiDPI Toggle**](https://github.com/nipunyatawara-dev/HiDPI-Toggle) is a tiny macOS menu bar app that replicates BetterDisplay's HiDPI feature: it lists connected external monitors and gives each one a switch to turn HiDPI (Retina scaling) on or off.
 
