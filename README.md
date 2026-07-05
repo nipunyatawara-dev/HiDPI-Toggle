@@ -99,6 +99,12 @@ Pre-built releases are available on the [Releases](https://github.com/nipunyataw
 1. Download `HiDPIToggle-v1.0.dmg`
 2. Open the disk image and drag **HiDPI Toggle** to Applications
 3. On first launch, macOS may block the app — open **System Settings → Privacy & Security** and click **Open Anyway**
+
+or run this **once** in Terminal:
+
+   ```bash
+   xattr -cr /Applications/HiDPIToggle.app
+   ```
 4. Connect an external monitor, click the menu bar icon, and toggle HiDPI
 
 **Requirements:** macOS 14 (Sonoma) or later · Apple Silicon (M1 or later)
