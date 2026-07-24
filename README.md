@@ -11,7 +11,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/nipunyatawara-dev/HiDPI-Toggle/releases/latest/download/HiDPIToggle-v1.0.dmg">
+  <a href="https://github.com/nipunyatawara-dev/HiDPI-Toggle/releases/latest/download/HiDPIToggle-v2.0.dmg">
     <img src="https://img.shields.io/badge/Download%20for-macOS%20%28Apple%20Silicon%29-0A84FF?style=for-the-badge&logo=apple&logoColor=white" alt="Download for macOS (Apple Silicon)" />
   </a>
 </p>
@@ -20,6 +20,8 @@
 [**HiDPI Toggle**](https://github.com/nipunyatawara-dev/HiDPI-Toggle) is a tiny macOS menu bar app that replicates BetterDisplay's HiDPI feature: it lists connected external monitors and gives each one a switch to turn HiDPI (Retina scaling) on or off.
 
 * One-click HiDPI toggle per external display from the menu bar
+* Resolution picker for each connected external display
+* Refresh-rate picker for the selected resolution and HiDPI mode
 * Instant mode switch — no virtual displays, mirroring, or black screens
 * Shows resolution, refresh rate, and current HiDPI state for each monitor
 * Auto-refreshes when displays are connected or disconnected
@@ -55,6 +57,8 @@
 Click the sparkle-TV icon in the menu bar to open the panel.
 
 * Each connected **external** monitor appears as a card with its name, resolution, and refresh rate
+* Choose a supported resolution from the **Resolution** menu
+* Choose a supported refresh rate from the **Refresh Rate** menu
 * Flip the switch to enable or disable HiDPI for that display
 * Displays without a HiDPI variant at the current resolution show **HiDPI unavailable** and the switch is disabled
 * Errors (mode read failures, unsupported displays) appear inline in red
@@ -69,12 +73,17 @@ The app lives in the menu bar only (`LSUIElement`); there is no Dock icon.
 
 macOS hides the HiDPI ("Retina") variants of an external monitor's resolutions from the public API and the Displays settings panel, but WindowServer keeps them in its internal mode list.
 
-HiDPI Toggle uses the same private CGS calls as BetterDisplay:
+HiDPI Toggle uses private CGS calls to read and switch display modes:
 
 * `CGSGetDisplayModeDescriptionOfLength` — reads the full mode list
-* `CGSConfigureDisplayMode` — switches to the hidden "same resolution, density 2.0" mode in place
+* `CGSConfigureDisplayMode` — switches resolutions or selects the hidden "same resolution, density 2.0" mode in place
 
-The GPU then renders at 2× and downscales, so text and UI look much sharper at the same logical resolution. Turning the switch off selects the density 1.0 mode again.
+The resolution menu lists the modes available at the current display density and
+tries to preserve the current refresh rate when switching. For HiDPI modes, the
+GPU renders at 2× and downscales, so text and UI look much sharper at the same
+logical resolution. The refresh-rate menu lists the rates available for the
+current resolution and density. Turning the switch off selects the density 1.0
+mode again.
 
 The `probe/` folder contains the small research tools used to discover these hidden modes:
 
@@ -96,7 +105,7 @@ Registration points at the app's current location on disk. If you move `HiDPITog
 
 Pre-built releases are available on the [Releases](https://github.com/nipunyatawara-dev/HiDPI-Toggle/releases) page.
 
-1. Download `HiDPIToggle-v1.0.dmg`
+1. Download `HiDPIToggle-v2.0.dmg`
 2. Open the disk image and drag **HiDPI Toggle** to Applications
 3. On first launch, macOS may block the app — open **System Settings → Privacy & Security** and click **Open Anyway**
 
@@ -159,7 +168,8 @@ swift build
 `Icon.icns` at the project root is bundled automatically by `Scripts/package_app.sh`. To regenerate it from the source artwork:
 
 ```bash
-swift probe/icon_gen.swift
+swift probe/icon_gen.swift icon-src.png Icon.iconset
+iconutil --convert icns --output Icon.icns Icon.iconset
 ```
 
 # Tech stack
@@ -179,7 +189,7 @@ swift probe/icon_gen.swift
 
 * **External displays only** — the built-in Mac display is filtered out
 * **Private APIs** — CGS mode-switch functions are undocumented Apple APIs; this app is not App Store–eligible (same situation as BetterDisplay for this feature)
-* **Session persistence** — HiDPI mode lasts for the current session; quitting the app does not revert it
+* **Session persistence** — resolution and HiDPI changes last for the current session; quitting the app does not revert them
 * **Hardware dependent** — not every monitor/resolution combination has a hidden HiDPI variant; the app disables the switch when none exists
 * **Ad-hoc signing** — the build script signs with an ad-hoc identity (`-`). For distribution outside your machine you may need to adjust signing or allow the app in **Privacy & Security**
 

@@ -19,9 +19,18 @@ struct ContentView: View {
                 .padding(.vertical, 20)
             } else {
                 ForEach(manager.displays) { display in
-                    DisplayRow(display: display) { enabled in
-                        manager.setHiDPI(enabled, for: display.id)
-                    }
+                    DisplayRow(
+                        display: display,
+                        onToggle: { enabled in
+                            manager.setHiDPI(enabled, for: display.id)
+                        },
+                        onResolutionChange: { resolution in
+                            manager.setResolution(resolution, for: display.id)
+                        },
+                        onRefreshRateChange: { refreshRate in
+                            manager.setRefreshRate(refreshRate, for: display.id)
+                        }
+                    )
                 }
             }
 
@@ -75,9 +84,11 @@ struct ContentView: View {
 private struct DisplayRow: View {
     let display: ExternalDisplay
     let onToggle: (Bool) -> Void
+    let onResolutionChange: (DisplayResolution) -> Void
+    let onRefreshRateChange: (DisplayRefreshRate) -> Void
 
     private var subtitle: String {
-        var text = "\(display.width)×\(display.height)  ·  \(display.refreshRate) Hz"
+        var text = "\(display.width)×\(display.height)  ·  \(display.refreshRateLabel)"
         if display.hiDPIEnabled {
             text += "  ·  HiDPI"
         } else if !display.hiDPIAvailable {
@@ -87,29 +98,88 @@ private struct DisplayRow: View {
     }
 
     var body: some View {
-        HStack(spacing: 10) {
-            Image(systemName: "display")
-                .font(.title3)
-                .foregroundStyle(display.hiDPIEnabled ? .blue : .secondary)
+        VStack(spacing: 8) {
+            HStack(spacing: 10) {
+                Image(systemName: "display")
+                    .font(.title3)
+                    .foregroundStyle(display.hiDPIEnabled ? .blue : .secondary)
 
-            VStack(alignment: .leading, spacing: 2) {
-                Text(display.name)
-                    .font(.system(size: 13, weight: .semibold))
-                Text(subtitle)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(display.name)
+                        .font(.system(size: 13, weight: .semibold))
+                    Text(subtitle)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+
+                Spacer()
+
+                Toggle("HiDPI", isOn: Binding(
+                    get: { display.hiDPIEnabled },
+                    set: { onToggle($0) }
+                ))
+                .labelsHidden()
+                .toggleStyle(.switch)
+                .controlSize(.small)
+                .disabled(!display.hiDPIAvailable)
             }
 
-            Spacer()
+            HStack {
+                Label("Resolution", systemImage: "rectangle.arrowtriangle.2.outward")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
 
-            Toggle("HiDPI", isOn: Binding(
-                get: { display.hiDPIEnabled },
-                set: { onToggle($0) }
-            ))
-            .labelsHidden()
-            .toggleStyle(.switch)
-            .controlSize(.small)
-            .disabled(!display.hiDPIAvailable)
+                Spacer()
+
+                Picker("Resolution", selection: Binding(
+                    get: { display.currentResolutionID },
+                    set: { resolutionID in
+                        guard let resolution = display.availableResolutions.first(where: {
+                            $0.id == resolutionID
+                        }) else {
+                            return
+                        }
+                        onResolutionChange(resolution)
+                    }
+                )) {
+                    ForEach(display.availableResolutions) { resolution in
+                        Text(resolution.label).tag(resolution.id)
+                    }
+                }
+                .labelsHidden()
+                .pickerStyle(.menu)
+                .controlSize(.small)
+                .fixedSize()
+            }
+
+            HStack {
+                Label("Refresh Rate", systemImage: "speedometer")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+
+                Spacer()
+
+                Picker("Refresh Rate", selection: Binding(
+                    get: { display.currentRefreshRateID },
+                    set: { refreshRateID in
+                        guard let refreshRate = display.availableRefreshRates.first(where: {
+                            $0.id == refreshRateID
+                        }) else {
+                            return
+                        }
+                        onRefreshRateChange(refreshRate)
+                    }
+                )) {
+                    ForEach(display.availableRefreshRates) { refreshRate in
+                        Text(refreshRate.label).tag(refreshRate.id)
+                    }
+                }
+                .labelsHidden()
+                .pickerStyle(.menu)
+                .controlSize(.small)
+                .fixedSize()
+                .disabled(display.availableRefreshRates.count < 2)
+            }
         }
         .padding(10)
         .background(

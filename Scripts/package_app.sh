@@ -33,11 +33,16 @@ APP="$ROOT/${APP_NAME}.app"
 rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources" "$APP/Contents/Frameworks"
 
-# Convert Icon.icon to Icon.icns if present (requires iconutil).
+# Create Icon.icns from either Apple's Icon Composer format or the checked-in
+# source artwork. Generated icon files stay ignored by Git.
 ICON_SOURCE="$ROOT/Icon.icon"
 ICON_TARGET="$ROOT/Icon.icns"
+ICONSET="$ROOT/Icon.iconset"
 if [[ -f "$ICON_SOURCE" ]]; then
   iconutil --convert icns --output "$ICON_TARGET" "$ICON_SOURCE"
+elif [[ ! -f "$ICON_TARGET" && -f "$ROOT/icon-src.png" ]]; then
+  swift "$ROOT/probe/icon_gen.swift" "$ROOT/icon-src.png" "$ICONSET"
+  iconutil --convert icns --output "$ICON_TARGET" "$ICONSET"
 fi
 
 LSUI_VALUE="false"
