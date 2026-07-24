@@ -17,19 +17,29 @@
 </p>
 
 
-[**HiDPI Toggle**](https://github.com/nipunyatawara-dev/HiDPI-Toggle) is a tiny macOS menu bar app that replicates BetterDisplay's HiDPI feature: it lists connected external monitors and gives each one a switch to turn HiDPI (Retina scaling) on or off.
+[**HiDPI Toggle**](https://github.com/nipunyatawara-dev/HiDPI-Toggle) is a tiny macOS menu bar app for controlling external displays. Toggle HiDPI (Retina scaling), choose a resolution, and change the refresh rate without opening System Settings.
 
 * One-click HiDPI toggle per external display from the menu bar
 * Resolution picker for each connected external display
 * Refresh-rate picker for the selected resolution and HiDPI mode
-* Instant mode switch — no virtual displays, mirroring, or black screens
+* Direct mode switching — no virtual displays or mirroring
 * Shows resolution, refresh rate, and current HiDPI state for each monitor
 * Auto-refreshes when displays are connected or disconnected
 * Launch at Login via `SMAppService` (visible in System Settings → Login Items)
 * Built with SwiftPM — no Xcode project required
 
+## What's new in version 2
+
+* Change the resolution of each connected external monitor
+* Change the refresh rate for the current resolution and HiDPI mode
+* Preserve the current refresh rate when changing resolution whenever supported
+* Restored the app icon in the application bundle and DMG
+
+See [CHANGELOG.md](CHANGELOG.md) for the version 2 release notes and installation instructions.
+
 # Contents <!-- omit in toc -->
 
+- [What's new in version 2](#whats-new-in-version-2)
 - [What HiDPI Toggle is and isn't](#what-hidpi-toggle-is-and-isnt)
 - [Menu bar panel](#menu-bar-panel)
 - [How it works](#how-it-works)
@@ -44,9 +54,9 @@
 
 # What HiDPI Toggle is and isn't
 
-* **HiDPI Toggle is** a free, open-source utility for anyone who wants sharper text and UI on an external monitor without paying for BetterDisplay — it unlocks the hidden Retina scaling modes macOS already knows about but does not expose in System Settings
+* **HiDPI Toggle is** a free, open-source utility for controlling HiDPI scaling, resolution, and refresh rate on external monitors. It unlocks hidden Retina scaling modes macOS already knows about but does not expose in System Settings.
 
-* **HiDPI Toggle is not** a full BetterDisplay replacement. It does not manage brightness, color profiles, virtual screens, DDC/CI, or display arrangements — only HiDPI scaling on external displays
+* **HiDPI Toggle is not** a full BetterDisplay replacement. It does not manage brightness, color profiles, virtual screens, DDC/CI, or display arrangements.
 
 <a name="panel"></a>
 
@@ -63,7 +73,7 @@ Click the sparkle-TV icon in the menu bar to open the panel.
 * Displays without a HiDPI variant at the current resolution show **HiDPI unavailable** and the switch is disabled
 * Errors (mode read failures, unsupported displays) appear inline in red
 * **Launch at Login** keeps the app running after reboot
-* **Quit HiDPI Toggle** exits the app — your current HiDPI setting stays in place for the session
+* **Quit HiDPI Toggle** exits the app — the selected display modes stay in place for the session
 
 The app lives in the menu bar only (`LSUIElement`); there is no Dock icon.
 
@@ -105,18 +115,21 @@ Registration points at the app's current location on disk. If you move `HiDPITog
 
 Pre-built releases are available on the [Releases](https://github.com/nipunyatawara-dev/HiDPI-Toggle/releases) page.
 
-1. Download `HiDPIToggle-v2.0.dmg`
-2. Open the disk image and drag **HiDPI Toggle** to Applications
-3. On first launch, macOS may block the app — open **System Settings → Privacy & Security** and click **Open Anyway**
+HiDPIToggle is ad-hoc signed, but it is not signed or notarized with an Apple Developer ID.
 
-or run this **once** in Terminal:
+1. Download `HiDPIToggle-v2.0.dmg`.
+2. Open the DMG and drag **HiDPIToggle** to **Applications**.
+3. Run this command **once** in Terminal:
 
    ```bash
    xattr -cr /Applications/HiDPIToggle.app
    ```
-4. Connect an external monitor, click the menu bar icon, and toggle HiDPI
 
-**Requirements:** macOS 14 (Sonoma) or later · Apple Silicon (M1 or later)
+   Alternatively, try to open the app, then go to **System Settings → Privacy & Security** and click **Open Anyway**.
+
+4. Connect an external monitor, click the sparkle-TV icon in the menu bar, and choose the desired HiDPI, resolution, and refresh-rate settings.
+
+**Requirements:** macOS 14 (Sonoma) or later · Apple Silicon (M1 or later) · External monitor
 
 <a name="build"></a>
 
@@ -154,7 +167,7 @@ xcode-select --install   # if you have not already
    open HiDPIToggle.app
    ```
 
-   The sparkle-TV icon appears in the menu bar. Connect an external monitor, click the icon, and toggle HiDPI.
+   The sparkle-TV icon appears in the menu bar. Connect an external monitor, click the icon, and choose the desired HiDPI, resolution, and refresh-rate settings.
 
 ### Debug build (terminal only)
 
@@ -165,7 +178,8 @@ swift build
 
 ### App icon
 
-`Icon.icns` at the project root is bundled automatically by `Scripts/package_app.sh`. To regenerate it from the source artwork:
+When `Icon.icns` is missing, `Scripts/package_app.sh` generates it automatically
+from `icon-src.png` and bundles it with the app. To regenerate it manually:
 
 ```bash
 swift probe/icon_gen.swift icon-src.png Icon.iconset
@@ -189,8 +203,8 @@ iconutil --convert icns --output Icon.icns Icon.iconset
 
 * **External displays only** — the built-in Mac display is filtered out
 * **Private APIs** — CGS mode-switch functions are undocumented Apple APIs; this app is not App Store–eligible (same situation as BetterDisplay for this feature)
-* **Session persistence** — resolution and HiDPI changes last for the current session; quitting the app does not revert them
-* **Hardware dependent** — not every monitor/resolution combination has a hidden HiDPI variant; the app disables the switch when none exists
+* **Session persistence** — resolution, refresh-rate, and HiDPI changes last for the current session; quitting the app does not revert them
+* **Hardware dependent** — available resolutions, refresh rates, and HiDPI variants depend on the monitor and connection; unsupported choices are not shown
 * **Ad-hoc signing** — the build script signs with an ad-hoc identity (`-`). For distribution outside your machine you may need to adjust signing or allow the app in **Privacy & Security**
 
 <a name="contributing"></a>
