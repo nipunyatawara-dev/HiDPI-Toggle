@@ -12,6 +12,7 @@ let package = Package(
             path: "Sources/CGSPrivate",
             linkerSettings: [
                 .linkedFramework("CoreGraphics"),
+                .linkedFramework("IOKit"),
             ]
         ),
         .executableTarget(

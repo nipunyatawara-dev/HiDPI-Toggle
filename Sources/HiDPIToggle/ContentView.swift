@@ -29,6 +29,9 @@ struct ContentView: View {
                         },
                         onRefreshRateChange: { refreshRate in
                             manager.setRefreshRate(refreshRate, for: display.id)
+                        },
+                        onBrightnessChange: { brightness in
+                            manager.setBrightness(brightness, for: display.id)
                         }
                     )
                 }
@@ -77,7 +80,7 @@ struct ContentView: View {
             .padding(.vertical, 2)
         }
         .padding(12)
-        .frame(width: 300)
+        .frame(width: 320)
     }
 }
 
@@ -86,6 +89,7 @@ private struct DisplayRow: View {
     let onToggle: (Bool) -> Void
     let onResolutionChange: (DisplayResolution) -> Void
     let onRefreshRateChange: (DisplayRefreshRate) -> Void
+    let onBrightnessChange: (Double) -> Void
 
     private var subtitle: String {
         var text = "\(display.width)×\(display.height)  ·  \(display.refreshRateLabel)"
@@ -95,6 +99,62 @@ private struct DisplayRow: View {
             text += "  ·  HiDPI unavailable"
         }
         return text
+    }
+
+    @ViewBuilder
+    private var brightnessControl: some View {
+        switch display.brightness {
+        case .checking:
+            HStack {
+                Label("Brightness", systemImage: "sun.max")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                Spacer()
+                ProgressView()
+                    .controlSize(.small)
+            }
+        case .unavailable:
+            HStack {
+                Label("Brightness", systemImage: "sun.max")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                Spacer()
+                Text("Unavailable")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        case .available(let value, let control):
+            HStack(spacing: 8) {
+                Label("Brightness", systemImage: "sun.max")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+
+                Slider(
+                    value: Binding(
+                        get: { value },
+                        set: { onBrightnessChange($0) }
+                    ),
+                    in: 0...1
+                )
+                .controlSize(.small)
+
+                Text("\(Int((value * 100).rounded()))%")
+                    .font(.caption.monospacedDigit())
+                    .foregroundStyle(.secondary)
+                    .frame(width: 34, alignment: .trailing)
+
+                if control == .software {
+                    Image(systemName: "circle.lefthalf.filled")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .help(
+                            "This connection does not return DDC/CI brightness data, "
+                                + "so HiDPI Toggle uses low-overhead software dimming. "
+                                + "The monitor's physical backlight is unchanged."
+                        )
+                }
+            }
+        }
     }
 
     var body: some View {
@@ -123,6 +183,8 @@ private struct DisplayRow: View {
                 .controlSize(.small)
                 .disabled(!display.hiDPIAvailable)
             }
+
+            brightnessControl
 
             HStack {
                 Label("Resolution", systemImage: "rectangle.arrowtriangle.2.outward")

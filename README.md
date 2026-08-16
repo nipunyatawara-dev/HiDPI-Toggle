@@ -11,7 +11,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/nipunyatawara-dev/HiDPI-Toggle/releases/latest/download/HiDPIToggle-v2.0.dmg">
+  <a href="https://github.com/nipunyatawara-dev/HiDPI-Toggle/releases/latest/download/HiDPIToggle-v3.0.dmg">
     <img src="https://img.shields.io/badge/Download%20for-macOS%20%28Apple%20Silicon%29-0A84FF?style=for-the-badge&logo=apple&logoColor=white" alt="Download for macOS (Apple Silicon)" />
   </a>
 </p>
@@ -20,6 +20,7 @@
 [**HiDPI Toggle**](https://github.com/nipunyatawara-dev/HiDPI-Toggle) is a tiny macOS menu bar app for controlling external displays. Toggle HiDPI (Retina scaling), choose a resolution, and change the refresh rate without opening System Settings.
 
 * One-click HiDPI toggle per external display from the menu bar
+* Hardware brightness over DDC/CI, with low-overhead software dimming as a fallback
 * Resolution picker for each connected external display
 * Refresh-rate picker for the selected resolution and HiDPI mode
 * Direct mode switching — no virtual displays or mirroring
@@ -28,18 +29,19 @@
 * Launch at Login via `SMAppService` (visible in System Settings → Login Items)
 * Built with SwiftPM — no Xcode project required
 
-## What's new in version 2
+## What's new in version 3
 
-* Change the resolution of each connected external monitor
-* Change the refresh rate for the current resolution and HiDPI mode
-* Preserve the current refresh rate when changing resolution whenever supported
-* Restored the app icon in the application bundle and DMG
+* Change external-monitor brightness from the menu bar
+* Use hardware DDC/CI brightness when supported by the monitor and connection
+* Fall back to low-overhead software dimming when DDC/CI is unavailable
+* Reduce repeated display scans and coalesce screen-change notifications
+* Fix display-observer lifetime and DDC/CI capability detection
 
-See [CHANGELOG.md](CHANGELOG.md) for the version 2 release notes and installation instructions.
+See [CHANGELOG.md](CHANGELOG.md) for the version 3 release notes and installation instructions.
 
 # Contents <!-- omit in toc -->
 
-- [What's new in version 2](#whats-new-in-version-2)
+- [What's new in version 3](#whats-new-in-version-3)
 - [What HiDPI Toggle is and isn't](#what-hidpi-toggle-is-and-isnt)
 - [Menu bar panel](#menu-bar-panel)
 - [How it works](#how-it-works)
@@ -56,7 +58,7 @@ See [CHANGELOG.md](CHANGELOG.md) for the version 2 release notes and installatio
 
 * **HiDPI Toggle is** a free, open-source utility for controlling HiDPI scaling, resolution, and refresh rate on external monitors. It unlocks hidden Retina scaling modes macOS already knows about but does not expose in System Settings.
 
-* **HiDPI Toggle is not** a full BetterDisplay replacement. It does not manage brightness, color profiles, virtual screens, DDC/CI, or display arrangements.
+* **HiDPI Toggle is not** a full BetterDisplay replacement. It does not manage color profiles, virtual screens, advanced DDC controls, or display arrangements.
 
 <a name="panel"></a>
 
@@ -67,6 +69,7 @@ See [CHANGELOG.md](CHANGELOG.md) for the version 2 release notes and installatio
 Click the sparkle-TV icon in the menu bar to open the panel.
 
 * Each connected **external** monitor appears as a card with its name, resolution, and refresh rate
+* Adjust brightness with the **Brightness** slider; the app uses DDC/CI when verified and software dimming otherwise
 * Choose a supported resolution from the **Resolution** menu
 * Choose a supported refresh rate from the **Refresh Rate** menu
 * Flip the switch to enable or disable HiDPI for that display
@@ -95,6 +98,13 @@ logical resolution. The refresh-rate menu lists the rates available for the
 current resolution and density. Turning the switch off selects the density 1.0
 mode again.
 
+Brightness control first probes the monitor's DDC/CI VCP brightness command
+through the Apple-silicon display controller. DDC operations run away from the UI
+thread and rapid slider changes are coalesced. If the monitor does not return a
+valid brightness reply, the app uses a CoreGraphics gamma adjustment instead.
+This fallback does not change the physical backlight, but it visibly dims the
+screen without adding a composited overlay or continuous GPU workload.
+
 The `probe/` folder contains the small research tools used to discover these hidden modes:
 
 * `probe.m` — dumps the WindowServer mode list for a display
@@ -117,7 +127,7 @@ Pre-built releases are available on the [Releases](https://github.com/nipunyataw
 
 HiDPIToggle is ad-hoc signed, but it is not signed or notarized with an Apple Developer ID.
 
-1. Download `HiDPIToggle-v2.0.dmg`.
+1. Download `HiDPIToggle-v3.0.dmg`.
 2. Open the DMG and drag **HiDPIToggle** to **Applications**.
 3. Run this command **once** in Terminal:
 
@@ -192,7 +202,7 @@ iconutil --convert icns --output Icon.icns Icon.iconset
 | --- | --- |
 | **Language** | Swift 6 |
 | **UI** | SwiftUI (`MenuBarExtra`, `.menuBarExtraStyle(.window)`) |
-| **Display APIs** | CoreGraphics + private CGS bindings (`CGSPrivate` target) |
+| **Display APIs** | CoreGraphics + private CGS mode switching and IOKit DDC/CI bindings (`CGSPrivate` target) |
 | **Login item** | ServiceManagement (`SMAppService`) |
 | **Packaging** | SwiftPM + `Scripts/package_app.sh` (no `.xcodeproj`) |
 | **Minimum OS** | macOS 14.0 |
@@ -205,6 +215,7 @@ iconutil --convert icns --output Icon.icns Icon.iconset
 * **Private APIs** — CGS mode-switch functions are undocumented Apple APIs; this app is not App Store–eligible (same situation as BetterDisplay for this feature)
 * **Session persistence** — resolution, refresh-rate, and HiDPI changes last for the current session; quitting the app does not revert them
 * **Hardware dependent** — available resolutions, refresh rates, and HiDPI variants depend on the monitor and connection; unsupported choices are not shown
+* **DDC/CI dependent** — hardware brightness requires a monitor, cable, adapter, and input that pass DDC/CI commands; otherwise the app uses software dimming and the physical backlight stays unchanged
 * **Ad-hoc signing** — the build script signs with an ad-hoc identity (`-`). For distribution outside your machine you may need to adjust signing or allow the app in **Privacy & Security**
 
 <a name="contributing"></a>

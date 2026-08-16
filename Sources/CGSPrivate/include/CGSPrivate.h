@@ -8,6 +8,8 @@
 #define CGS_PRIVATE_H
 
 #include <CoreGraphics/CoreGraphics.h>
+#include <stdbool.h>
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -32,6 +34,14 @@ void CGSGetDisplayModeDescriptionOfLength(CGDirectDisplayID display, int idx,
 void CGSGetCurrentDisplayMode(CGDirectDisplayID display, int *modeNum);
 CGError CGSConfigureDisplayMode(CGDisplayConfigRef config,
                                 CGDirectDisplayID display, int modeNum);
+
+// External display brightness over DDC/CI. The probe result is:
+// 0 = no matching transport, 1 = transport without a valid VCP reply,
+// 2 = readable brightness control.
+int32_t HDTDDCProbeBrightness(CGDirectDisplayID display,
+                              uint16_t *currentValue,
+                              uint16_t *maximumValue);
+bool HDTDDCWriteBrightness(CGDirectDisplayID display, uint16_t value);
 
 #ifdef __cplusplus
 }
