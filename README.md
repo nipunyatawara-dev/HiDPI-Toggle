@@ -11,7 +11,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/nipunyatawara-dev/HiDPI-Toggle/releases/latest/download/HiDPIToggle-v3.0.dmg">
+  <a href="https://github.com/nipunyatawara-dev/HiDPI-Toggle/releases/latest">
     <img src="https://img.shields.io/badge/Download%20for-macOS%20%28Apple%20Silicon%29-0A84FF?style=for-the-badge&logo=apple&logoColor=white" alt="Download for macOS (Apple Silicon)" />
   </a>
 </p>
