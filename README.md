@@ -46,7 +46,7 @@ See [CHANGELOG.md](CHANGELOG.md) for the version 3 release notes and installatio
 - [Menu bar panel](#menu-bar-panel)
 - [How it works](#how-it-works)
 - [Launch at login](#launch-at-login)
-- [Download](#download)
+- [Installation & download](#download)
 - [Build & run](#build--run)
 - [Tech stack](#tech-stack)
 - [Limitations](#limitations)
@@ -121,7 +121,15 @@ Registration points at the app's current location on disk. If you move `HiDPITog
 
 <a name="download"></a>
 
-# Download
+# Installation & Download
+
+### Option 1: Install with Homebrew (Recommended)
+
+```bash
+brew install --cask nipunyatawara-dev/tap/hidpi-toggle
+```
+
+### Option 2: Manual Download (.dmg)
 
 Pre-built releases are available on the [Releases](https://github.com/nipunyatawara-dev/HiDPI-Toggle/releases) page.
 
